@@ -59,13 +59,13 @@ def dashboard():
     
     # Fetch dashboard stats
     cursor.execute("SELECT COUNT(*) FROM Donors")
-    total_donors = cursor.fetchone()[0]
+    total_donors = cursor.fetchone()[0] or 0
     cursor.execute("SELECT COUNT(*) FROM Patients")
     total_patients = cursor.fetchone()[0]
     cursor.execute("SELECT COUNT(*) FROM BloodRequests WHERE status = 'Pending'")
     pending_requests = cursor.fetchone()[0]
-    cursor.execute("SELECT SUM(quantity) FROM BloodInventory")
-    total_blood = cursor.fetchone()[0] or 0
+    cursor.execute("SELECT COALESCE(SUM(quantity), 0) FROM BloodInventory")
+    total_blood = cursor.fetchone()[0]
 
     return render_template('dashboard.html', total_donors=total_donors, total_patients=total_patients, pending_requests=pending_requests, total_blood=total_blood)
 # Approve Blood Request Route
