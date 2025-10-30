@@ -1,0 +1,87 @@
+CREATE DATABASE blood_bank;
+	USE blood_bank;
+
+	-- Users Table
+	CREATE TABLE Users (
+		user_id INT AUTO_INCREMENT PRIMARY KEY,
+		username VARCHAR(50) NOT NULL UNIQUE,
+		password VARCHAR(255) NOT NULL,
+		role ENUM('admin', 'staff') DEFAULT 'staff'
+	);
+
+	-- Donors Table
+	CREATE TABLE Donors (
+		donor_id INT AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(100) NOT NULL,
+		age INT NOT NULL,
+		gender ENUM('Male', 'Female', 'Other') NOT NULL,
+		blood_group ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-') NOT NULL,
+		contact VARCHAR(15) NOT NULL,
+		address TEXT NOT NULL
+	);
+
+	-- Hospitals Table
+	CREATE TABLE Hospitals (
+		hospital_id INT AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(100) NOT NULL,
+		address TEXT NOT NULL,
+		contact VARCHAR(15) NOT NULL
+	);
+
+	-- Patients Table
+	CREATE TABLE Patients (
+		patient_id INT AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(100) NOT NULL,
+		age INT NOT NULL,
+		gender ENUM('Male', 'Female', 'Other') NOT NULL,
+		blood_group ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-') NOT NULL,
+		contact VARCHAR(15) NOT NULL,
+		hospital_id INT,
+		FOREIGN KEY (hospital_id) REFERENCES Hospitals(hospital_id)
+	);
+
+	-- BloodInventory Table
+	CREATE TABLE BloodInventory (
+		blood_id INT AUTO_INCREMENT PRIMARY KEY,
+		blood_group ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-') NOT NULL,
+		quantity INT NOT NULL
+	);
+
+	-- BloodRequests Table
+	CREATE TABLE BloodRequests (
+		request_id INT AUTO_INCREMENT PRIMARY KEY,
+		patient_id INT,
+		blood_group ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-') NOT NULL,
+		quantity INT NOT NULL,
+		status ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
+		hospital_id INT,
+		FOREIGN KEY (patient_id) REFERENCES Patients(patient_id),
+		FOREIGN KEY (hospital_id) REFERENCES Hospitals(hospital_id)
+	);
+
+	-- Staff Table
+	CREATE TABLE Staff (
+		staff_id INT AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(100) NOT NULL,
+		role VARCHAR(50) NOT NULL,
+		hospital_id INT,
+		FOREIGN KEY (hospital_id) REFERENCES Hospitals(hospital_id)
+	);
+
+	-- Donations Table
+	CREATE TABLE Donations (
+		donation_id INT AUTO_INCREMENT PRIMARY KEY,
+		donor_id INT,
+		donation_date DATE NOT NULL,
+		quantity INT NOT NULL,
+		FOREIGN KEY (donor_id) REFERENCES Donors(donor_id)
+	);
+
+	-- Transactions Table
+	CREATE TABLE Transactions (
+		transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+		blood_group ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-') NOT NULL,
+		quantity INT NOT NULL,
+		transaction_type ENUM('Donation', 'Request') NOT NULL,
+		transaction_date DATE NOT NULL
+	);
